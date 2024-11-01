@@ -4,7 +4,7 @@
 - 💞️ I’m looking to collaborate with a worker who understands my abilities.
 - 📫 How to reach me by e - mail
 - 😄 Pronouns: I currently have projects.
-- ⚡ Fun fact: I have encountered unusual situations in project work on a portfolio, in particular with and
+- ⚡ Fun fact: I have encountered unusual situations in project work on a portfolio.
 
 
 <!---
