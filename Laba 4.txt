@@ -1,0 +1,135 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class EquationSolver extends JFrame {
+    private JTextField xField;
+    private JTextField yField;
+    private JTextField zField;
+    private JTextArea resultArea;
+    private JTextArea branchingResultArea;
+
+    public EquationSolver() {
+        setTitle("Практическая работа 4");
+        setSize(600, 500);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        // Вкладка для уравнения β
+        JPanel equationPanel = new JPanel();
+        equationPanel.setLayout(new FlowLayout());
+
+        JLabel equationLabel = new JLabel("β = √(10 * (x^(1/3) + x^y + 2)) * (arcsin^2(z) - |x - y|)");
+        equationPanel.add(equationLabel);
+
+        equationPanel.add(new JLabel("Введите x:"));
+        xField = new JTextField(10);
+        equationPanel.add(xField);
+
+        equationPanel.add(new JLabel("Введите y:"));
+        yField = new JTextField(10);
+        equationPanel.add(yField);
+
+        equationPanel.add(new JLabel("Введите z:"));
+        zField = new JTextField(10);
+        equationPanel.add(zField);
+
+        JButton calculateButton = new JButton("Рассчитать β");
+        calculateButton.addActionListener(new CalculateButtonListener());
+        equationPanel.add(calculateButton);
+
+        resultArea = new JTextArea(5, 30);
+        resultArea.setEditable(false);
+        equationPanel.add(new JScrollPane(resultArea));
+
+        // Вкладка для разветвляющегося алгоритма
+        JPanel branchingPanel = new JPanel();
+        branchingPanel.setLayout(new FlowLayout());
+
+        // Добавление уравнения l
+        JLabel branchingEquationLabel = new JLabel("<html>l = {<br/>" +
+                "f^2(x) + arctg(f(x)), при 1 ≤ x < 5<br/>" +
+                "(y - f(x))^2 + arctg(f(x)), при y > x<br/>" +
+                "(y + f(x))^3 + 0.5, иначе<br/>" +
+                "}</html>");
+        branchingPanel.add(branchingEquationLabel);
+
+        branchingPanel.add(new JLabel("Введите x:"));
+        JTextField branchXField = new JTextField(10);
+        branchingPanel.add(branchXField);
+
+        branchingPanel.add(new JLabel("Введите y:"));
+        JTextField branchYField = new JTextField(10);
+        branchingPanel.add(branchYField);
+
+        JButton branchCalculateButton = new JButton("Рассчитать l");
+        branchingPanel.add(branchCalculateButton);
+
+        branchingResultArea = new JTextArea(5, 30);
+        branchingResultArea.setEditable(false);
+        branchingPanel.add(new JScrollPane(branchingResultArea));
+
+        branchCalculateButton.addActionListener(e -> {
+            try {
+                double x = Double.parseDouble(branchXField.getText());
+                double y = Double.parseDouble(branchYField.getText());
+                double result = calculateBranching(x, y);
+                branchingResultArea.setText("Результат l: " + result);
+            } catch (NumberFormatException ex) {
+                branchingResultArea.setText("Ошибка ввода! Пожалуйста, введите числовые значения.");
+            }
+        });
+
+        // Вкладки
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Линейный алгоритм", equationPanel);
+        tabbedPane.addTab("Разветвляющийся алгоритм", branchingPanel);
+
+        add(tabbedPane, BorderLayout.CENTER);
+        setVisible(true);
+    }
+
+    private class CalculateButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                double x = Double.parseDouble(xField.getText());
+                double y = Double.parseDouble(yField.getText());
+                double z = Double.parseDouble(zField.getText());
+
+                double beta = calculateBeta(x, y, z);
+                resultArea.setText("β = " + beta);
+            } catch (NumberFormatException ex) {
+                resultArea.setText("Ошибка ввода! Пожалуйста, введите числовые значения.");
+            } catch (IllegalArgumentException ex) {
+                resultArea.setText(ex.getMessage());
+            }
+        }
+    }
+
+    private double calculateBeta(double x, double y, double z) {
+        if (z < -1 || z > 1) {
+            throw new IllegalArgumentException("z должно быть в диапазоне [-1, 1] для функции arcsin.");
+        }
+
+        double term1 = Math.sqrt(10 * (Math.pow(x, 1.0 / 3.0) + Math.pow(x, y + 2)));
+        double term2 = Math.pow(Math.asin(z), 2) - Math.abs(x - y);
+        return term1 * term2;
+    }
+
+    private double calculateBranching(double x, double y) {
+        double f = Math.pow(x, 2); // Определение функции f(x) = x^2
+        if (1 <= x && x < 5) {
+            return Math.pow(f, 2) + Math.atan(f); // arctg(f(x)) = atan(f(x))
+        } else if (y > x) {
+            return Math.pow(y - f, 2) + Math.atan(f);
+        } else {
+            return Math.pow(y + f, 3) + 0.5;
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(EquationSolver::new);
+    }
+}
